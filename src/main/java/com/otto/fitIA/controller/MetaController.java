@@ -2,7 +2,9 @@ package com.otto.fitIA.controller;
 
 
 import com.otto.fitIA.dto.MetaResponse;
+import com.otto.fitIA.dto.PlanoTreinoResponse;
 import com.otto.fitIA.models.Meta;
+import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.repository.MetaRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
 import com.otto.fitIA.service.MetaService;
@@ -53,6 +55,17 @@ public class MetaController {
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         metaService.buscarPorId(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
+    @PutMapping("/{id}")
+    public ResponseEntity<MetaResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody Meta meta) {
+
+        Meta atualizado = metaService.atualizar(id, meta);
+
+        return ResponseEntity.ok(converter(atualizado));
     }
 
     private MetaResponse converter(Meta meta) {

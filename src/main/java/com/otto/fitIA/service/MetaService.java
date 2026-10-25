@@ -2,6 +2,7 @@ package com.otto.fitIA.service;
 
 
 import com.otto.fitIA.models.Meta;
+import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.models.Usuario;
 import com.otto.fitIA.repository.MetaRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
@@ -60,6 +61,18 @@ public class MetaService {
                         HttpStatus.NOT_FOUND,
                         "Meta com esse ID não encontrada"
                 ));
+    }
+
+    public Meta atualizar(Long id, Meta dados) {
+        Meta meta= buscarPorId(id);
+
+        meta.setDescricao(dados.getDescricao());
+        meta.setDataInicio(dados.getDataInicio());
+        meta.setPrazo(dados.getPrazo());
+        meta.setProgresso(dados.getProgresso());
+
+
+        return metaRepository.save(meta);
     }
 
     public void excluir(Long id) {
