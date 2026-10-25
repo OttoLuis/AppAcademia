@@ -53,6 +53,7 @@ public class PerfilFisicoControlller {
         return ResponseEntity.ok(converter(perfil));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PutMapping("/{id}")
     public ResponseEntity<PerfilFisicoResponse> atualizar(
             @PathVariable Long id,
@@ -63,7 +64,7 @@ public class PerfilFisicoControlller {
         return ResponseEntity.ok(converter(atualizado));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         service.excluir(id);

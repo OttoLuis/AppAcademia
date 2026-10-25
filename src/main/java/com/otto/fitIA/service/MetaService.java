@@ -2,7 +2,6 @@ package com.otto.fitIA.service;
 
 
 import com.otto.fitIA.models.Meta;
-import com.otto.fitIA.models.PerfilFisico;
 import com.otto.fitIA.models.Usuario;
 import com.otto.fitIA.repository.MetaRepository;
 import com.otto.fitIA.repository.UsuarioRepository;

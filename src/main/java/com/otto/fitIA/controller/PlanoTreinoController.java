@@ -1,11 +1,7 @@
 package com.otto.fitIA.controller;
 
-
-import com.otto.fitIA.dto.PerfilFisicoResponse;
 import com.otto.fitIA.dto.PlanoTreinoResponse;
-import com.otto.fitIA.models.PerfilFisico;
 import com.otto.fitIA.models.PlanoTreino;
-import com.otto.fitIA.repository.PlanoTreinoRepository;
 import com.otto.fitIA.service.PlanoTreinoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +21,7 @@ public class PlanoTreinoController {
     }
 
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping
     public ResponseEntity<List<PlanoTreinoResponse>> listarTodos() {
         List<PlanoTreinoResponse> perfis = planoTreinoService.listarTodos()
@@ -37,6 +34,7 @@ public class PlanoTreinoController {
 
 
     //Buscar Por id
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping("/{id}")
     public ResponseEntity<PlanoTreinoResponse> buscarPorId(
             @PathVariable Long id) {
@@ -47,6 +45,7 @@ public class PlanoTreinoController {
     }
 
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<PlanoTreinoResponse> cadastrar(
             @RequestBody PlanoTreino planoTreino) {
@@ -58,6 +57,7 @@ public class PlanoTreinoController {
     }
 
     //Atualizar Dados Por id
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PutMapping("/{id}")
     public ResponseEntity<PlanoTreinoResponse> atualizar(
             @PathVariable Long id,
@@ -70,7 +70,7 @@ public class PlanoTreinoController {
 
 
     //Deletar Por Id
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         planoTreinoService.excluir(id);

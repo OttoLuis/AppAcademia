@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "perfilFisico_db")
-public class PerfilFisico{
+public class    PerfilFisico{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
