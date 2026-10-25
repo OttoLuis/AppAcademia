@@ -27,6 +27,7 @@ public class MetaController {
         this.usuarioRepository = usuarioRepository;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping
     public ResponseEntity<List<MetaResponse>> listarTodos() {
         List<MetaResponse> metas = metaService.listarTodos()
@@ -36,7 +37,7 @@ public class MetaController {
 
         return ResponseEntity.ok(metas);
     }
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<MetaResponse> cadastrar(
             @RequestBody Meta meta) {
@@ -47,7 +48,7 @@ public class MetaController {
                 .body(converter(novaMeta));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         metaService.buscarPorId(id);
