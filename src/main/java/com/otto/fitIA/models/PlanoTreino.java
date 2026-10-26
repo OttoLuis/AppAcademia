@@ -4,6 +4,8 @@ package com.otto.fitIA.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "planoTreino_db")
@@ -22,18 +24,22 @@ public class PlanoTreino {
 
     }
 
-    public PlanoTreino(Long id, String nomeTreino, String objetivo, LocalDate dataInicio, LocalDate dataFim, Usuario usuario) {
+    public PlanoTreino(Long id, String nomeTreino, String objetivo, LocalDate dataInicio, LocalDate dataFim, Usuario usuario, List<PlanoExercicio> planoExercicios) {
         this.id = id;
         this.nomeTreino = nomeTreino;
         this.objetivo = objetivo;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.usuario = usuario;
+        this.planoExercicios = planoExercicios;
     }
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "planoTreino")
+    private List<PlanoExercicio> planoExercicios = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -81,5 +87,13 @@ public class PlanoTreino {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public List<PlanoExercicio> getPlanoExercicios() {
+        return planoExercicios;
+    }
+
+    public void setPlanoExercicios(List<PlanoExercicio> planoExercicios) {
+        this.planoExercicios = planoExercicios;
     }
 }

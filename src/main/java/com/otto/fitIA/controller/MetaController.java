@@ -2,9 +2,7 @@ package com.otto.fitIA.controller;
 
 
 import com.otto.fitIA.dto.MetaResponse;
-import com.otto.fitIA.dto.PlanoTreinoResponse;
 import com.otto.fitIA.models.Meta;
-import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.repository.MetaRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
 import com.otto.fitIA.service.MetaService;
