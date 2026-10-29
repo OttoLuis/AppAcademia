@@ -53,10 +53,9 @@ public class MetaController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        metaService.buscarPorId(id);
+        metaService.excluir(id);
         return ResponseEntity.noContent().build();
     }
-
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PutMapping("/{id}")
     public ResponseEntity<MetaResponse> atualizar(
