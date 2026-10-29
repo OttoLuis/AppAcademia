@@ -50,3 +50,9 @@ application-local.yaml
 
 # Logs
 *.log
+
+# Configurações locais do Spring Boot
+src/main/resources/application.properties
+
+# Manter o arquivo de exemplo versionado
+!src/main/resources/application-example.properties
