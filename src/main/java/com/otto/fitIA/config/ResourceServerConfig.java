@@ -57,10 +57,12 @@ public class ResourceServerConfig {
         http
                 .csrf(csrf -> csrf.disable())
 
-                .authorizeHttpRequests(authorize ->
-                        authorize
-                                .anyRequest()
-                                .permitAll()
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.POST,
+                                "/usuarios"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 .oauth2ResourceServer(oauth2 ->

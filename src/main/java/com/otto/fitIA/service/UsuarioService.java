@@ -1,10 +1,13 @@
-package com.otto.fitIA.service;
 
+package com.otto.fitIA.service;
 
 import com.otto.fitIA.models.Role;
 import com.otto.fitIA.models.Usuario;
-import com.otto.fitIA.projection.UserDetailsProjection;
 import com.otto.fitIA.repository.UsuarioRepository;
+import com.otto.fitIA.projection.UserDetailsProjection;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +18,6 @@ import java.util.List;
 @Service
 public class UsuarioService implements UserDetailsService {
 
-
     private final UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
@@ -24,24 +26,23 @@ public class UsuarioService implements UserDetailsService {
 
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "Usuário não encontrado com ID: " + id
-                        ));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Usuário não encontrado: " + id
+                ));
     }
 
     public Usuario atualizar(Long id, Usuario dadosAtualizados) {
-        Usuario usuario = buscarPorId(id);
+        Usuario existente = buscarPorId(id);
 
-        usuario.setNome(dadosAtualizados.getNome());
-        usuario.setEmail(dadosAtualizados.getEmail());
+        existente.setNome(dadosAtualizados.getNome());
+        existente.setEmail(dadosAtualizados.getEmail());
 
         if (dadosAtualizados.getSenha() != null
                 && !dadosAtualizados.getSenha().isBlank()) {
-            usuario.setSenha(dadosAtualizados.getSenha());
+            existente.setSenha(dadosAtualizados.getSenha());
         }
 
-        return usuarioRepository.save(usuario);
+        return usuarioRepository.save(existente);
     }
 
     public void excluir(Long id) {
@@ -49,19 +50,74 @@ public class UsuarioService implements UserDetailsService {
         usuarioRepository.delete(usuario);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        List<UserDetailsProjection> resultado = usuarioRepository.searchUserAndRolesByEmail(username);
+    public void validarAcessoAoUsuario(
+            Long id,
+            Authentication authentication
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
 
-        if (resultado.size() == 0){ // se a lista(de usuario) estiver vazia cai no exception
-            throw new UsernameNotFoundException("Usuario näo encontrado");
+        if (ehAdmin(authentication)) {
+            return;
         }
-        Usuario usuario = new Usuario(); //cria um novo usuario(vazio)
-        usuario.setEmail(username); //coloca o email encontrado na consulta
-        usuario.setSenha(resultado.get(0).getPassword()); // coloca a senha e pega o primeiro resultado da lista
-        for (UserDetailsProjection projection : resultado ){   //percorre os resultados
-            usuario.addRole(new Role(projection.getRoleId(), projection.getAuthority())); //cria a role, e adiciona a role ao usuario criado
+
+        Usuario atual = usuarioRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new AccessDeniedException(
+                        "Usuário autenticado não encontrado."
+                ));
+
+        if (!atual.getId().equals(id)) {
+            throw new AccessDeniedException(
+                    "Você não pode acessar a conta de outro usuário."
+            );
         }
-        return usuario; //retorna o usuario
+    }
+
+    public void exigirAdmin(Authentication authentication) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || !ehAdmin(authentication)) {
+            throw new AccessDeniedException(
+                    "Apenas administradores podem realizar esta operação."
+            );
+        }
+    }
+
+    private boolean ehAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority ->
+                        authority.getAuthority().equals("ROLE_ADMIN")
+                );
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        List<UserDetailsProjection> resultado =
+                usuarioRepository.searchUserAndRolesByEmail(username);
+
+        if (resultado.isEmpty()) {
+            throw new UsernameNotFoundException(
+                    "Usuário não encontrado: " + username
+            );
+        }
+
+        Usuario usuario = new Usuario();
+
+        usuario.setEmail(username);
+        usuario.setSenha(resultado.get(0).getPassword());
+
+        for (UserDetailsProjection projection : resultado) {
+            usuario.addRole(
+                    new Role(
+                            projection.getRoleId(),
+                            projection.getAuthority()
+                    )
+            );
+        }
+
+        return usuario;
     }
 }
