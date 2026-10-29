@@ -1,9 +1,11 @@
+
 package com.otto.fitIA.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import org.jspecify.annotations.Nullable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,45 +19,58 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome é obrigatório")
+    @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres")
     @Column(nullable = false)
     private String nome;
 
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "Informe um e-mail válido")
+    @Size(max = 254, message = "O e-mail deve ter no máximo 254 caracteres")
     @Column(nullable = false, unique = true)
-    @Email
     private String email;
 
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres")
     @Column(nullable = false)
     private String senha;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
     private List<Meta> metas = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
     private List<PlanoTreino> planoTreinos = new ArrayList<>();
 
-    public Usuario(){
+    @OneToOne(mappedBy = "usuario")
+    @JsonIgnore
+    private PerfilFisico perfilFisico;
 
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_role_tb",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    public Usuario() {
     }
 
-    public Usuario(Long id, String nome, String email, String senha, PerfilFisico perfilFisico) {
+    public Usuario(
+            Long id,
+            String nome,
+            String email,
+            String senha,
+            PerfilFisico perfilFisico
+    ) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.perfilFisico = perfilFisico;
     }
-    @OneToOne(mappedBy = "usuario")
-    @JsonIgnore
-    private PerfilFisico perfilFisico;
-
-    @ManyToMany
-    @JoinTable(name = "usuario_role_tb",
-            joinColumns = @JoinColumn(name = "usuario_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
-
-
 
     public Long getId() {
         return id;
@@ -93,6 +108,10 @@ public class Usuario implements UserDetails {
         return perfilFisico;
     }
 
+    public void setPerfilFisico(PerfilFisico perfilFisico) {
+        this.perfilFisico = perfilFisico;
+    }
+
     public List<Meta> getMetas() {
         return metas;
     }
@@ -109,23 +128,18 @@ public class Usuario implements UserDetails {
         this.planoTreinos = planoTreinos;
     }
 
-    public void setPerfilFisico(PerfilFisico perfilFisico) {
-        this.perfilFisico = perfilFisico;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Usuario usuario = (Usuario) o;
-        return Objects.equals(id, usuario.id);
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
-    public void addRole(Role role){
+    public void addRole(Role role) {
         roles.add(role);
-
     }
+
     public boolean hasRole(String roleNome) {
         for (Role role : roles) {
             if (role.getAuthority().equals(roleNome)) {
@@ -137,17 +151,13 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
     }
 
     @Override
-    public @Nullable String getPassword() {
+    @JsonIgnore
+    public String getPassword() {
         return senha;
     }
 
@@ -156,14 +166,23 @@ public class Usuario implements UserDetails {
         return email;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Usuario usuario = (Usuario) o;
+
+        return id != null && Objects.equals(id, usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : System.identityHashCode(this);
+    }
 }
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 package com.otto.fitIA.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -15,8 +16,10 @@ public class Meta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "esse campo não pode ser vazio")
     private String descricao;
 
+    @NotBlank(message = "esse campo não pode ser vazio")
     private LocalDate dataInicio;
 
     private LocalDate prazo;

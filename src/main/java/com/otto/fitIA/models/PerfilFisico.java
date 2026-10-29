@@ -4,6 +4,9 @@ package com.otto.fitIA.models;
 import com.otto.fitIA.enums.NivelExperiencia;
 import com.otto.fitIA.enums.ObjetivoFisico;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 @Entity
 @Table(name = "perfilFisico_db")
@@ -13,11 +16,13 @@ public class    PerfilFisico{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "O objetivo físico é obrigatório")
     @Enumerated(EnumType.STRING)
     private ObjetivoFisico objetivo;
 
     @Enumerated(EnumType.STRING)
     private NivelExperiencia experiencia;
+
 
     private Integer frequenciaSemanal;
 
@@ -25,10 +30,16 @@ public class    PerfilFisico{
 
     private String equipamentoDisponivel;
 
+    @NotNull(message = "O peso é obrigatório")
+    @Positive(message = "O peso deve ser maior que zero")
     private Double peso;
 
+    @NotNull(message = "A altura é obrigatória")
+    @Positive(message = "A altura deve ser maior que zero")
     private Double altura;
 
+    @NotNull(message = "A idade é obrigatória")
+    @Positive(message = "A idade deve ser maior que zero")
     private Integer idade;
 
     public PerfilFisico(){

@@ -2,6 +2,8 @@ package com.otto.fitIA.models;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,9 +17,16 @@ public class PlanoTreino {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome do treino é obrigatório")
     private String nomeTreino;
+
+    @NotBlank(message = "O objetivo do treino é obrigatório")
     private String objetivo;
+
+    @NotNull(message = "A data de início é obrigatória")
     private LocalDate dataInicio;
+
+    @NotNull(message = "A data de término é obrigatória")
     private LocalDate dataFim;
 
     public PlanoTreino(){

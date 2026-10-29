@@ -5,7 +5,6 @@ import com.otto.fitIA.models.Role;
 import com.otto.fitIA.models.Usuario;
 import com.otto.fitIA.projection.UserDetailsProjection;
 import com.otto.fitIA.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +20,33 @@ public class UsuarioService implements UserDetailsService {
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
+    }
+
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Usuário não encontrado com ID: " + id
+                        ));
+    }
+
+    public Usuario atualizar(Long id, Usuario dadosAtualizados) {
+        Usuario usuario = buscarPorId(id);
+
+        usuario.setNome(dadosAtualizados.getNome());
+        usuario.setEmail(dadosAtualizados.getEmail());
+
+        if (dadosAtualizados.getSenha() != null
+                && !dadosAtualizados.getSenha().isBlank()) {
+            usuario.setSenha(dadosAtualizados.getSenha());
+        }
+
+        return usuarioRepository.save(usuario);
+    }
+
+    public void excluir(Long id) {
+        Usuario usuario = buscarPorId(id);
+        usuarioRepository.delete(usuario);
     }
 
     @Override

@@ -4,6 +4,7 @@ package com.otto.fitIA.controller;
 import com.otto.fitIA.dto.ExercicioResponse;
 import com.otto.fitIA.models.Exercicio;
 import com.otto.fitIA.service.ExercicioService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +49,7 @@ public class ExercicioController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ExercicioResponse> cadastrar(
-            @RequestBody Exercicio exercicio
+          @Valid @RequestBody Exercicio exercicio
     ) {
         Exercicio salvo = exercicioService.cadastrar(exercicio);
 
@@ -61,7 +62,7 @@ public class ExercicioController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ExercicioResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody Exercicio exercicio
+            @Valid @RequestBody Exercicio exercicio
     ) {
         Exercicio atualizado = exercicioService.atualizar(id, exercicio);
 

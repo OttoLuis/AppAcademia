@@ -3,6 +3,7 @@ package com.otto.fitIA.controller;
 import com.otto.fitIA.dto.PlanoTreinoResponse;
 import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.service.PlanoTreinoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +49,7 @@ public class PlanoTreinoController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<PlanoTreinoResponse> cadastrar(
-            @RequestBody PlanoTreino planoTreino) {
+            @Valid @RequestBody PlanoTreino planoTreino) {
 
         PlanoTreino novoPlanoTreino = planoTreinoService.cadastrar(planoTreino);
 
@@ -61,7 +62,7 @@ public class PlanoTreinoController {
     @PutMapping("/{id}")
     public ResponseEntity<PlanoTreinoResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody PlanoTreino planoTreino) {
+            @Valid @RequestBody PlanoTreino planoTreino) {
 
         PlanoTreino atualizado = planoTreinoService.atualizar(id, planoTreino);
 

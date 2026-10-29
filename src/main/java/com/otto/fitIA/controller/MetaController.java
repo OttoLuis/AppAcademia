@@ -6,6 +6,7 @@ import com.otto.fitIA.models.Meta;
 import com.otto.fitIA.repository.MetaRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
 import com.otto.fitIA.service.MetaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,7 @@ public class MetaController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<MetaResponse> cadastrar(
+            @Valid
             @RequestBody Meta meta) {
 
         Meta novaMeta = metaService.cadastrar(meta);
@@ -59,7 +61,7 @@ public class MetaController {
     @PutMapping("/{id}")
     public ResponseEntity<MetaResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody Meta meta) {
+            @Valid @RequestBody Meta meta) {
 
         Meta atualizado = metaService.atualizar(id, meta);
 

@@ -4,6 +4,7 @@ package com.otto.fitIA.controller;
 import com.otto.fitIA.dto.PerfilFisicoResponse;
 import com.otto.fitIA.models.PerfilFisico;
 import com.otto.fitIA.service.PerfilFisicoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class PerfilFisicoControlller {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<PerfilFisicoResponse> cadastrar(
-            @RequestBody PerfilFisico perfil) {
+            @Valid @RequestBody PerfilFisico perfil) {
 
         PerfilFisico novoPerfil = service.cadastrar(perfil);
 
@@ -57,7 +58,7 @@ public class PerfilFisicoControlller {
     @PutMapping("/{id}")
     public ResponseEntity<PerfilFisicoResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody PerfilFisico perfil) {
+            @Valid  @RequestBody PerfilFisico perfil) {
 
         PerfilFisico atualizado = service.atualizar(id, perfil);
 

@@ -3,6 +3,9 @@ package com.otto.fitIA.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +18,18 @@ public class Exercicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome do exercício não pode ficar vazio")
     private String nomeExercicio;
+
+    @NotBlank(message = "O grupo muscular não pode ficar vazio")
     private String grupoMuscular;
+
+    @NotBlank(message = "A descrição do exercício não pode ficar vazia")
     private String descricao;
+
     private String equipamento;
+
+
     private String nivelDificuldade;
 
     public Exercicio(){
@@ -37,7 +48,7 @@ public class Exercicio {
 
     @OneToMany(mappedBy = "exercicio")
     @JsonIgnore
-    private List<PlanoExercicio> planoExercicios = new ArrayList<>();;
+    private List<PlanoExercicio> planoExercicios = new ArrayList<>();
 
 
     public Long getId() {

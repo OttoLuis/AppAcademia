@@ -5,6 +5,7 @@ import com.otto.fitIA.models.PlanoExercicio;
 import com.otto.fitIA.service.PlanoExercicioService;
 import com.otto.fitIA.dto.PlanoExercicioResponse;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,7 +50,7 @@ public class PlanoExercicioController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<PlanoExercicioResponse> cadastrar(
-            @RequestBody PlanoExercicio planoExercicio,
+            @Valid @RequestBody PlanoExercicio planoExercicio,
             @RequestParam Long exercicioId) {
 
         PlanoExercicio salvo =
@@ -67,7 +68,7 @@ public class PlanoExercicioController {
     @PutMapping("/{id}")
     public ResponseEntity<PlanoExercicioResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody PlanoExercicio planoExercicio) {
+            @Valid @RequestBody PlanoExercicio planoExercicio) {
 
         PlanoExercicio atualizado =
                 planoExercicioService.atualizar(id, planoExercicio);
