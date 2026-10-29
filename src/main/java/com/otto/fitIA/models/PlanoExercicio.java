@@ -32,8 +32,8 @@ public class PlanoExercicio {
         this.planoTreino = planoTreino;
     }
 
-    @OneToOne
-    @MapsId
+    @ManyToOne
+    @JoinColumn(name = "exercicio_id", nullable = false)
     private Exercicio exercicio;
 
     @ManyToOne

@@ -4,6 +4,9 @@ package com.otto.fitIA.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "exercicio_db")
 public class Exercicio {
@@ -22,21 +25,19 @@ public class Exercicio {
 
     }
 
-    public Exercicio(Long id, String nomeExercicio, String grupoMuscular, String descricao, String equipamento, String nivelDificuldade, PlanoExercicio planoExercicio) {
+    public Exercicio(Long id, String nomeExercicio, String grupoMuscular, String descricao, String equipamento, String nivelDificuldade, List<PlanoExercicio> planoExercicios) {
         this.id = id;
         this.nomeExercicio = nomeExercicio;
         this.grupoMuscular = grupoMuscular;
         this.descricao = descricao;
         this.equipamento = equipamento;
         this.nivelDificuldade = nivelDificuldade;
-        this.planoExercicio = planoExercicio;
+        this.planoExercicios = planoExercicios;
     }
 
-
-
-    @OneToOne(mappedBy = "exercicio")
+    @OneToMany(mappedBy = "exercicio")
     @JsonIgnore
-    private PlanoExercicio planoExercicio;
+    private List<PlanoExercicio> planoExercicios = new ArrayList<>();;
 
 
     public Long getId() {
@@ -87,11 +88,11 @@ public class Exercicio {
         this.nivelDificuldade = nivelDificuldade;
     }
 
-    public PlanoExercicio getPlanoExercicio() {
-        return planoExercicio;
+    public List<PlanoExercicio> getPlanoExercicios() {
+        return planoExercicios;
     }
 
-    public void setPlanoExercicio(PlanoExercicio planoExercicio) {
-        this.planoExercicio = planoExercicio;
+    public void setPlanoExercicios(List<PlanoExercicio> planoExercicios) {
+        this.planoExercicios = planoExercicios;
     }
 }
