@@ -7,6 +7,7 @@ import com.otto.fitIA.dto.PlanoExercicioResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class PlanoExercicioController {
         this.planoExercicioService = planoExercicioService;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping
     public ResponseEntity<List<PlanoExercicioResponse>> listarTodos() {
         List<PlanoExercicioResponse> resposta =
@@ -33,6 +35,7 @@ public class PlanoExercicioController {
         return ResponseEntity.ok(resposta);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping("/{id}")
     public ResponseEntity<PlanoExercicioResponse> buscarPorId(
             @PathVariable Long id) {
@@ -43,6 +46,7 @@ public class PlanoExercicioController {
         return ResponseEntity.ok(converter(planoExercicio));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<PlanoExercicioResponse> cadastrar(
             @RequestBody PlanoExercicio planoExercicio,
@@ -58,6 +62,8 @@ public class PlanoExercicioController {
                 .body(converter(salvo));
     }
 
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PutMapping("/{id}")
     public ResponseEntity<PlanoExercicioResponse> atualizar(
             @PathVariable Long id,
@@ -69,6 +75,8 @@ public class PlanoExercicioController {
         return ResponseEntity.ok(converter(atualizado));
     }
 
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         planoExercicioService.excluir(id);
