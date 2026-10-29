@@ -1,15 +1,15 @@
-
 package com.otto.fitIA.service;
 
+import com.otto.fitIA.exception.RecursoNaoEncontradoException;
+import com.otto.fitIA.exception.RegraDeNegocioException;
 import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.models.Usuario;
 import com.otto.fitIA.repository.PlanoTreinoRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -32,18 +32,20 @@ public class PlanoTreinoService {
 
         if (authentication == null
                 || !authentication.isAuthenticated()
-                || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RegraDeNegocioException(
                     "Usuário não autenticado"
             );
         }
 
-        return usuarioRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuário não encontrado"
-                ));
+        String email = authentication.getName();
+
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Usuário não encontrado com e-mail: " + email
+                        )
+                );
     }
 
     private boolean isAdmin() {
@@ -61,9 +63,9 @@ public class PlanoTreinoService {
 
         if (!isAdmin()
                 && (planoTreino.getUsuario() == null
-                || !planoTreino.getUsuario().getId().equals(usuario.getId()))) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
+                || !planoTreino.getUsuario().getId()
+                .equals(usuario.getId()))) {
+            throw new RegraDeNegocioException(
                     "Você não tem permissão para acessar este plano de treino"
             );
         }
@@ -72,6 +74,7 @@ public class PlanoTreinoService {
     public PlanoTreino cadastrar(PlanoTreino planoTreino) {
         Usuario usuario = obterUsuarioAutenticado();
 
+        planoTreino.setId(null);
         planoTreino.setUsuario(usuario);
 
         return planoTreinoRepository.save(planoTreino);
@@ -87,16 +90,18 @@ public class PlanoTreinoService {
         return planoTreinoRepository.findAll()
                 .stream()
                 .filter(plano -> plano.getUsuario() != null
-                        && plano.getUsuario().getId().equals(usuario.getId()))
+                        && plano.getUsuario().getId()
+                        .equals(usuario.getId()))
                 .toList();
     }
 
     public PlanoTreino buscarPorId(Long id) {
         PlanoTreino planoTreino = planoTreinoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Plano de treino com esse id não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Plano de treino", id
+                        )
+                );
 
         verificarPermissao(planoTreino);
 

@@ -1,6 +1,8 @@
 
 package com.otto.fitIA.service;
 
+import com.otto.fitIA.exception.RecursoDuplicadoException;
+import com.otto.fitIA.exception.RecursoNaoEncontradoException;
 import com.otto.fitIA.models.PerfilFisico;
 import com.otto.fitIA.models.Usuario;
 import com.otto.fitIA.repository.PerfilFisicoRepository;
@@ -31,9 +33,10 @@ public class PerfilFisicoService {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null ||
-                !authentication.isAuthenticated() ||
-                authentication.getPrincipal().equals("anonymousUser")) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "Usuário não autenticado"
@@ -43,14 +46,14 @@ public class PerfilFisicoService {
         String email = authentication.getName();
 
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuário não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Usuário não encontrado com e-mail: " + email
+                        )
+                );
 
         if (usuario.getPerfilFisico() != null) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new RecursoDuplicadoException(
                     "Este usuário já possui um perfil físico"
             );
         }
@@ -67,10 +70,9 @@ public class PerfilFisicoService {
 
     public PerfilFisico buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Perfil físico com esse id não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Perfil físico", id)
+                );
     }
 
     public PerfilFisico atualizar(Long id, PerfilFisico dados) {

@@ -1,6 +1,7 @@
-
 package com.otto.fitIA.service;
 
+import com.otto.fitIA.exception.RecursoNaoEncontradoException;
+import com.otto.fitIA.exception.RegraDeNegocioException;
 import com.otto.fitIA.models.Exercicio;
 import com.otto.fitIA.models.PlanoExercicio;
 import com.otto.fitIA.models.PlanoTreino;
@@ -10,11 +11,9 @@ import com.otto.fitIA.repository.PlanoExercicioRepository;
 import com.otto.fitIA.repository.PlanoTreinoRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -38,54 +37,87 @@ public class PlanoExercicioService {
         this.exercicioRepository = exercicioRepository;
     }
 
-    public List<PlanoExercicio> listarTodos() {
-        return planoExercicioRepository.findAll();
-    }
-
-    public PlanoExercicio buscarPorId(Long id) {
-        return planoExercicioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Plano de exercício não encontrado"
-                ));
-    }
-
-    public PlanoExercicio cadastrar(
-            PlanoExercicio dados,
-            Long exercicioId) {
-
+    private Usuario obterUsuarioAutenticado() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
+            throw new RegraDeNegocioException(
                     "Usuário não autenticado"
             );
         }
 
         String email = authentication.getName();
 
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuário não encontrado"
-                ));
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Usuário não encontrado com e-mail: " + email
+                        )
+                );
+    }
+
+    private void verificarPermissao(PlanoExercicio planoExercicio) {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        Long usuarioDonoId = planoExercicio.getPlanoTreino()
+                .getUsuario()
+                .getId();
+
+        if (!usuarioDonoId.equals(usuario.getId())) {
+            throw new RegraDeNegocioException(
+                    "Você não tem permissão para acessar este exercício do plano"
+            );
+        }
+    }
+
+    public List<PlanoExercicio> listarTodos() {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        return planoExercicioRepository.findAll().stream()
+                .filter(item -> item.getPlanoTreino() != null
+                        && item.getPlanoTreino().getUsuario() != null
+                        && item.getPlanoTreino().getUsuario().getId()
+                        .equals(usuario.getId()))
+                .toList();
+    }
+
+    public PlanoExercicio buscarPorId(Long id) {
+        PlanoExercicio planoExercicio = planoExercicioRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Exercício do plano", id
+                        )
+                );
+
+        verificarPermissao(planoExercicio);
+
+        return planoExercicio;
+    }
+
+    public PlanoExercicio cadastrar(
+            PlanoExercicio dados,
+            Long exercicioId) {
+
+        Usuario usuario = obterUsuarioAutenticado();
 
         PlanoTreino planoTreino = planoTreinoRepository
                 .findByUsuarioId(usuario.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Plano de treino não encontrado para este usuário"
-                ));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Plano de treino do usuário"
+                        )
+                );
 
         Exercicio exercicio = exercicioRepository.findById(exercicioId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Exercício não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Exercício", exercicioId
+                        )
+                );
 
         dados.setId(null);
         dados.setPlanoTreino(planoTreino);

@@ -1,11 +1,11 @@
 
 package com.otto.fitIA.service;
 
+import com.otto.fitIA.exception.RecursoNaoEncontradoException;
 import com.otto.fitIA.models.Exercicio;
 import com.otto.fitIA.repository.ExercicioRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import java.util.List;
 
@@ -24,10 +24,9 @@ public class ExercicioService {
 
     public Exercicio buscarPorId(Long id) {
         return exercicioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Exercício não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Exercício", id)
+                );
     }
 
     public Exercicio cadastrar(Exercicio exercicio) {
