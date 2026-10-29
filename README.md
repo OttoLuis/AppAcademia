@@ -222,6 +222,4 @@ Entre as possibilidades de evolução do projeto estão:
 
 ---
 
-Projeto desenvolvido para fins de aprendizado e evolução técnica em desenvolvimento backend com Java e Spring Boot.
-
 **Em Desenvolvimento**
