@@ -1,11 +1,11 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/logo-dark.svg">
-    <img src="./assets/logo-light.svg" alt="Logo do FitIA" width="300">
-  </picture>
+<img width="1700" height="550" alt="fitIA-logo-escura" src="https://github.com/user-attachments/assets/46e60e25-4d84-4a7c-9eeb-6b982c62b6e6" />
 </p>
 
-# FitIA — Plataforma de Treinos Personalizados
+<p align="center">
+  FitIA — Plataforma de Treinos Personalizados
+</p>
+
 
 O **FitIA** é uma aplicação backend desenvolvida em Java com Spring Boot, voltada à personalização e ao acompanhamento de treinos físicos. O sistema permite organizar informações do usuário, registrar metas e estruturar planos de treino de acordo com seus objetivos.
 
