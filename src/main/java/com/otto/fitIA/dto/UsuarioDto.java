@@ -1,13 +1,30 @@
+
 package com.otto.fitIA.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Dados básicos do usuário")
 public class UsuarioDto {
 
+    @Schema(
+            description = "Identificador do usuário",
+            example = "1"
+    )
     private Long id;
+
+    @Schema(
+            description = "Nome completo do usuário",
+            example = "Carlos Luis"
+    )
     private String nome;
+
+    @Schema(
+            description = "Endereço de e-mail do usuário",
+            example = "maicon@email.com"
+    )
     private String email;
 
-    public UsuarioDto(){
+    public UsuarioDto() {
 
     }
 
