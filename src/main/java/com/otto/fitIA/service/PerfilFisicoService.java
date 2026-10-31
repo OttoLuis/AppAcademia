@@ -96,4 +96,5 @@ public class PerfilFisicoService {
         PerfilFisico perfil = buscarPorId(id);
         repository.delete(perfil);
     }
+
 }
