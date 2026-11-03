@@ -1,6 +1,9 @@
 package com.otto.fitIA.service;
 
 import com.otto.fitIA.dto.*;
+import com.otto.fitIA.dto.response.ExercicioTreinoIAResponse;
+import com.otto.fitIA.dto.response.GerarTreinoIAResponse;
+import com.otto.fitIA.dto.response.PlanoTreinoResponse;
 import com.otto.fitIA.exception.RegraDeNegocioException;
 import com.otto.fitIA.ia.GroqClient;
 import com.otto.fitIA.models.*;

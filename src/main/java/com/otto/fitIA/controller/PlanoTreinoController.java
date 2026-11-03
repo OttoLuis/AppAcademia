@@ -1,9 +1,12 @@
 package com.otto.fitIA.controller;
 
-import com.otto.fitIA.dto.PlanoTreinoResponse;
+import com.otto.fitIA.dto.response.PlanoExercicioDetalhadoResponse;
+import com.otto.fitIA.dto.response.PlanoTreinoResponse;
 import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.service.PlanoTreinoService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,20 +24,18 @@ public class PlanoTreinoController {
         this.planoTreinoService = planoTreinoService;
     }
 
-
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping
     public ResponseEntity<List<PlanoTreinoResponse>> listarTodos() {
-        List<PlanoTreinoResponse> perfis = planoTreinoService.listarTodos()
+
+        List<PlanoTreinoResponse> planos = planoTreinoService.listarTodos()
                 .stream()
                 .map(this::converter)
                 .toList();
 
-        return ResponseEntity.ok(perfis);
+        return ResponseEntity.ok(planos);
     }
 
-
-    //Buscar Por id
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping("/{id}")
     public ResponseEntity<PlanoTreinoResponse> buscarPorId(
@@ -45,42 +46,51 @@ public class PlanoTreinoController {
         return ResponseEntity.ok(converter(planoTreino));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
+    @GetMapping("/{id}/exercicios")
+    public ResponseEntity<List<PlanoExercicioDetalhadoResponse>> listarExercicios(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                planoTreinoService.listarExercicios(id)
+        );
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PostMapping
     public ResponseEntity<PlanoTreinoResponse> cadastrar(
             @Valid @RequestBody PlanoTreino planoTreino) {
 
-        PlanoTreino novoPlanoTreino = planoTreinoService.cadastrar(planoTreino);
+        PlanoTreino novoPlanoTreino =
+                planoTreinoService.cadastrar(planoTreino);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(converter(novoPlanoTreino));
     }
 
-    //Atualizar Dados Por id
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PutMapping("/{id}")
     public ResponseEntity<PlanoTreinoResponse> atualizar(
             @PathVariable Long id,
             @Valid @RequestBody PlanoTreino planoTreino) {
 
-        PlanoTreino atualizado = planoTreinoService.atualizar(id, planoTreino);
+        PlanoTreino atualizado =
+                planoTreinoService.atualizar(id, planoTreino);
 
         return ResponseEntity.ok(converter(atualizado));
     }
 
-
-    //Deletar Por Id
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
+
         planoTreinoService.excluir(id);
+
         return ResponseEntity.noContent().build();
     }
 
-
-
     private PlanoTreinoResponse converter(PlanoTreino planoTreino) {
+
         return new PlanoTreinoResponse(
                 planoTreino.getId(),
                 planoTreino.getNomeTreino(),

@@ -1,7 +1,7 @@
 
 package com.otto.fitIA.controller;
 
-import com.otto.fitIA.dto.PerfilFisicoResponse;
+import com.otto.fitIA.dto.response.PerfilFisicoResponse;
 import com.otto.fitIA.models.PerfilFisico;
 import com.otto.fitIA.service.PerfilFisicoService;
 import jakarta.validation.Valid;

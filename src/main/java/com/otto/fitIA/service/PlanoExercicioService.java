@@ -1,3 +1,4 @@
+
 package com.otto.fitIA.service;
 
 import com.otto.fitIA.exception.RecursoNaoEncontradoException;
@@ -38,12 +39,14 @@ public class PlanoExercicioService {
     }
 
     private Usuario obterUsuarioAutenticado() {
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
+
             throw new RegraDeNegocioException(
                     "Usuário não autenticado"
             );
@@ -60,13 +63,14 @@ public class PlanoExercicioService {
     }
 
     private void verificarPermissao(PlanoExercicio planoExercicio) {
+
         Usuario usuario = obterUsuarioAutenticado();
 
-        Long usuarioDonoId = planoExercicio.getPlanoTreino()
-                .getUsuario()
-                .getId();
+        if (planoExercicio.getPlanoTreino() == null
+                || planoExercicio.getPlanoTreino().getUsuario() == null
+                || !planoExercicio.getPlanoTreino()
+                .getUsuario().getId().equals(usuario.getId())) {
 
-        if (!usuarioDonoId.equals(usuario.getId())) {
             throw new RegraDeNegocioException(
                     "Você não tem permissão para acessar este exercício do plano"
             );
@@ -74,17 +78,21 @@ public class PlanoExercicioService {
     }
 
     public List<PlanoExercicio> listarTodos() {
+
         Usuario usuario = obterUsuarioAutenticado();
 
-        return planoExercicioRepository.findAll().stream()
-                .filter(item -> item.getPlanoTreino() != null
-                        && item.getPlanoTreino().getUsuario() != null
-                        && item.getPlanoTreino().getUsuario().getId()
-                        .equals(usuario.getId()))
+        return planoExercicioRepository.findAll()
+                .stream()
+                .filter(item ->
+                        item.getPlanoTreino() != null
+                                && item.getPlanoTreino().getUsuario() != null
+                                && item.getPlanoTreino().getUsuario()
+                                .getId().equals(usuario.getId()))
                 .toList();
     }
 
     public PlanoExercicio buscarPorId(Long id) {
+
         PlanoExercicio planoExercicio = planoExercicioRepository
                 .findById(id)
                 .orElseThrow(() ->
@@ -100,17 +108,24 @@ public class PlanoExercicioService {
 
     public PlanoExercicio cadastrar(
             PlanoExercicio dados,
+            Long planoTreinoId,
             Long exercicioId) {
 
         Usuario usuario = obterUsuarioAutenticado();
 
         PlanoTreino planoTreino = planoTreinoRepository
-                .findByUsuarioId(usuario.getId())
+                .findById(planoTreinoId)
                 .orElseThrow(() ->
                         new RecursoNaoEncontradoException(
-                                "Plano de treino do usuário"
+                                "Plano de treino", planoTreinoId
                         )
                 );
+
+        if (!planoTreino.getUsuario().getId().equals(usuario.getId())) {
+            throw new RegraDeNegocioException(
+                    "Você não tem permissão para adicionar exercícios a este plano"
+            );
+        }
 
         Exercicio exercicio = exercicioRepository.findById(exercicioId)
                 .orElseThrow(() ->
@@ -144,7 +159,9 @@ public class PlanoExercicioService {
     }
 
     public void excluir(Long id) {
+
         PlanoExercicio existente = buscarPorId(id);
+
         planoExercicioRepository.delete(existente);
     }
 }

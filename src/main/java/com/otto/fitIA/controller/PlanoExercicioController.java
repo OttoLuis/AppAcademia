@@ -3,7 +3,7 @@ package com.otto.fitIA.controller;
 
 import com.otto.fitIA.models.PlanoExercicio;
 import com.otto.fitIA.service.PlanoExercicioService;
-import com.otto.fitIA.dto.PlanoExercicioResponse;
+import com.otto.fitIA.dto.response.PlanoExercicioResponse;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,6 +27,7 @@ public class PlanoExercicioController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @GetMapping
     public ResponseEntity<List<PlanoExercicioResponse>> listarTodos() {
+
         List<PlanoExercicioResponse> resposta =
                 planoExercicioService.listarTodos()
                         .stream()
@@ -51,18 +52,19 @@ public class PlanoExercicioController {
     @PostMapping
     public ResponseEntity<PlanoExercicioResponse> cadastrar(
             @Valid @RequestBody PlanoExercicio planoExercicio,
+            @RequestParam Long planoTreinoId,
             @RequestParam Long exercicioId) {
 
         PlanoExercicio salvo =
                 planoExercicioService.cadastrar(
                         planoExercicio,
+                        planoTreinoId,
                         exercicioId
                 );
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(converter(salvo));
     }
-
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @PutMapping("/{id}")
@@ -76,11 +78,12 @@ public class PlanoExercicioController {
         return ResponseEntity.ok(converter(atualizado));
     }
 
-
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USUARIO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
+
         planoExercicioService.excluir(id);
+
         return ResponseEntity.noContent().build();
     }
 

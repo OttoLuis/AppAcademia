@@ -1,5 +1,5 @@
 
-package com.otto.fitIA.dto;
+package com.otto.fitIA.dto.response;
 
 import com.otto.fitIA.enums.NivelExperiencia;
 import com.otto.fitIA.enums.ObjetivoFisico;

@@ -1,9 +1,13 @@
+
 package com.otto.fitIA.service;
 
+import com.otto.fitIA.dto.response.PlanoExercicioDetalhadoResponse;
 import com.otto.fitIA.exception.RecursoNaoEncontradoException;
 import com.otto.fitIA.exception.RegraDeNegocioException;
+import com.otto.fitIA.models.PlanoExercicio;
 import com.otto.fitIA.models.PlanoTreino;
 import com.otto.fitIA.models.Usuario;
+import com.otto.fitIA.repository.PlanoExercicioRepository;
 import com.otto.fitIA.repository.PlanoTreinoRepository;
 import com.otto.fitIA.repository.UsuarioRepository;
 
@@ -18,21 +22,27 @@ public class PlanoTreinoService {
 
     private final UsuarioRepository usuarioRepository;
     private final PlanoTreinoRepository planoTreinoRepository;
+    private final PlanoExercicioRepository planoExercicioRepository;
 
     public PlanoTreinoService(
             UsuarioRepository usuarioRepository,
-            PlanoTreinoRepository planoTreinoRepository) {
+            PlanoTreinoRepository planoTreinoRepository,
+            PlanoExercicioRepository planoExercicioRepository) {
+
         this.usuarioRepository = usuarioRepository;
         this.planoTreinoRepository = planoTreinoRepository;
+        this.planoExercicioRepository = planoExercicioRepository;
     }
 
     private Usuario obterUsuarioAutenticado() {
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
+
             throw new RegraDeNegocioException(
                     "Usuário não autenticado"
             );
@@ -49,6 +59,7 @@ public class PlanoTreinoService {
     }
 
     private boolean isAdmin() {
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
@@ -59,12 +70,14 @@ public class PlanoTreinoService {
     }
 
     private void verificarPermissao(PlanoTreino planoTreino) {
+
         Usuario usuario = obterUsuarioAutenticado();
 
         if (!isAdmin()
                 && (planoTreino.getUsuario() == null
                 || !planoTreino.getUsuario().getId()
                 .equals(usuario.getId()))) {
+
             throw new RegraDeNegocioException(
                     "Você não tem permissão para acessar este plano de treino"
             );
@@ -72,6 +85,7 @@ public class PlanoTreinoService {
     }
 
     public PlanoTreino cadastrar(PlanoTreino planoTreino) {
+
         Usuario usuario = obterUsuarioAutenticado();
 
         planoTreino.setId(null);
@@ -81,21 +95,18 @@ public class PlanoTreinoService {
     }
 
     public List<PlanoTreino> listarTodos() {
+
         if (isAdmin()) {
             return planoTreinoRepository.findAll();
         }
 
         Usuario usuario = obterUsuarioAutenticado();
 
-        return planoTreinoRepository.findAll()
-                .stream()
-                .filter(plano -> plano.getUsuario() != null
-                        && plano.getUsuario().getId()
-                        .equals(usuario.getId()))
-                .toList();
+        return planoTreinoRepository.findByUsuarioId(usuario.getId());
     }
 
     public PlanoTreino buscarPorId(Long id) {
+
         PlanoTreino planoTreino = planoTreinoRepository.findById(id)
                 .orElseThrow(() ->
                         new RecursoNaoEncontradoException(
@@ -108,7 +119,42 @@ public class PlanoTreinoService {
         return planoTreino;
     }
 
+    public List<PlanoExercicioDetalhadoResponse> listarExercicios(
+            Long planoTreinoId) {
+
+        // Verifica se o plano existe e pertence ao usuário autenticado.
+        buscarPorId(planoTreinoId);
+
+        List<PlanoExercicio> exercicios =
+                planoExercicioRepository
+                        .findByPlanoTreinoIdOrderByDiaTreinoAscOrdemAsc(
+                                planoTreinoId
+                        );
+
+        return exercicios.stream()
+                .map(exercicio -> new PlanoExercicioDetalhadoResponse(
+                        exercicio.getId(),
+                        exercicio.getDiaTreino(),
+                        exercicio.getOrdem(),
+                        exercicio.getSeries(),
+                        exercicio.getRepeticoes(),
+                        exercicio.getSegundosDeDescanso(),
+                        exercicio.getPlanoTreino().getId(),
+                        exercicio.getExercicio().getId(),
+                        exercicio.getExercicio().getNomeExercicio(),
+                        exercicio.getExercicio().getGrupoMuscular(),
+                        exercicio.getExercicio().getDescricao(),
+                        exercicio.getExercicio().getEquipamento(),
+                        exercicio.getExercicio().getNivelDificuldade() != null
+                                ? exercicio.getExercicio()
+                                .getNivelDificuldade().toString()
+                                : null
+                ))
+                .toList();
+    }
+
     public PlanoTreino atualizar(Long id, PlanoTreino dados) {
+
         PlanoTreino planoTreino = buscarPorId(id);
 
         planoTreino.setNomeTreino(dados.getNomeTreino());
@@ -120,7 +166,9 @@ public class PlanoTreinoService {
     }
 
     public void excluir(Long id) {
+
         PlanoTreino planoTreino = buscarPorId(id);
+
         planoTreinoRepository.delete(planoTreino);
     }
 }

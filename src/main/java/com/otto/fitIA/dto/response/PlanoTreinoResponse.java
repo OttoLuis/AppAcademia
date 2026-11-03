@@ -1,5 +1,5 @@
 
-package com.otto.fitIA.dto;
+package com.otto.fitIA.dto.response;
 
 import java.time.LocalDate;
 

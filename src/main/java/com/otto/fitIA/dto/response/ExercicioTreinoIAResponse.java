@@ -1,4 +1,4 @@
-package com.otto.fitIA.dto;
+package com.otto.fitIA.dto.response;
 
 
 public record ExercicioTreinoIAResponse(

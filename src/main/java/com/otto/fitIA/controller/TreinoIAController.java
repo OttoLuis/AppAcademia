@@ -1,6 +1,6 @@
 package com.otto.fitIA.controller;
 
-import com.otto.fitIA.dto.GerarTreinoIAResponse;
+import com.otto.fitIA.dto.response.GerarTreinoIAResponse;
 import com.otto.fitIA.service.TreinoIAService;
 
 import org.springframework.web.bind.annotation.*;
@@ -19,4 +19,6 @@ public class TreinoIAController {
     public GerarTreinoIAResponse gerarTreino() {
         return treinoIAService.gerarTreino();
     }
+
+
 }

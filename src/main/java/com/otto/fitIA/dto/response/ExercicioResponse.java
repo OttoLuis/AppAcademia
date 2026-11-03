@@ -1,5 +1,5 @@
 
-package com.otto.fitIA.dto;
+package com.otto.fitIA.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

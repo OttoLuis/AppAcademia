@@ -1,7 +1,7 @@
 
 package com.otto.fitIA.controller;
 
-import com.otto.fitIA.dto.ExercicioResponse;
+import com.otto.fitIA.dto.response.ExercicioResponse;
 import com.otto.fitIA.models.Exercicio;
 import com.otto.fitIA.service.ExercicioService;
 import jakarta.validation.Valid;
